@@ -25,7 +25,8 @@ def load_data():
             return None
 
     try:
-        df = pd.read_excel(file_path)
+        df = pd.read_excel(file_path, sheet_name=1) 
+        
         if "data" in df.columns:
             df["data"] = pd.to_numeric(df["data"], errors="coerce")
         return df
