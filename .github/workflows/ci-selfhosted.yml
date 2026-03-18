@@ -1,0 +1,37 @@
+name: CI (self-hosted)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-visualization-local:
+    runs-on: [self-hosted, Windows, X64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: System Check
+        run: |
+          python --version
+          pip --version
+
+      - name: Install dependencies
+        run: |
+          # Використовуємо python -m pip, щоб уникнути проблем із прямим викликом pip у 3.13
+          python -m pip install -r requirements.txt
+
+      - name: Run visualization module
+        run: |
+          # Створюємо папку для артефактів (Windows style)
+          if (!(Test-Path "artifacts/visualization")) { mkdir -Force "artifacts/visualization" }
+          
+          # Запускаємо модуль і записуємо лог
+          python src/visualization.py > artifacts/visualization/run.log 2>&1
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-visualization-selfhosted
+          path: artifacts/visualization
