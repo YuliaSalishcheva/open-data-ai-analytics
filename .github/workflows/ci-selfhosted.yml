@@ -2,6 +2,8 @@ name: CI (self-hosted)
 
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
 
 jobs:
   run-visualization-local:
@@ -11,22 +13,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
       - name: System Check
         run: |
           python --version
-          pip --version
+          python -m pip --version
 
       - name: Install dependencies
         run: |
-          # Використовуємо python -m pip, щоб уникнути проблем із прямим викликом pip у 3.13
-          python -m pip install -r requirements.txt
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) { python -m pip install -r requirements.txt }
 
       - name: Run visualization module
         run: |
-          # Створюємо папку для артефактів (Windows style)
-          if (!(Test-Path "artifacts/visualization")) { mkdir -Force "artifacts/visualization" }
+          # Створюємо папку для артефактів (PowerShell style)
+          if (!(Test-Path "artifacts/visualization")) { New-Item -ItemType Directory -Force -Path "artifacts/visualization" }
           
-          # Запускаємо модуль і записуємо лог
+          # Запускаємо модуль. Переконайся, що шлях src/visualization.py вірний
+          # Якщо файл лежить в корені, приберіть "src/"
           python src/visualization.py > artifacts/visualization/run.log 2>&1
 
       - name: Upload artifacts
