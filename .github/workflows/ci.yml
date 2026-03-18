@@ -33,8 +33,6 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         uses: actions/checkout@v4
 
-      # Крок Set up Python ВИДАЛЕНО! Використовуємо ваш локальний Python.
-
       - name: Install dependencies
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         run: |
@@ -43,10 +41,12 @@ jobs:
 
       - name: Run ${{ matrix.module }}
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
-        # Змінено команду створення папки на кросплатформову (щоб працювало і на Linux, і на Windows)
         run: |
-          python -c "import os; os.makedirs('artifacts/${{ matrix.module }}', exist_ok=True)"
-          python src/${{ matrix.module }}.py > artifacts/${{ matrix.module }}/run.log 2>&1
+          # Створюємо папку командою, яку 100% розуміє Windows
+          mkdir -Force artifacts/${{ matrix.module }}
+          
+          # Запускаємо скрипт. Тепер ми побачимо весь вивід прямо на GitHub!
+          python src/${{ matrix.module }}.py
 
       - name: Upload Artifacts
         if: ${{ !cancelled() && (github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module) }}
