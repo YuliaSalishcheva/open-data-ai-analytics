@@ -33,12 +33,7 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
-          cache: "pip"
+      # Крок Set up Python ВИДАЛЕНО! Використовуємо ваш локальний Python.
 
       - name: Install dependencies
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
@@ -48,8 +43,9 @@ jobs:
 
       - name: Run ${{ matrix.module }}
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
+        # Змінено команду створення папки на кросплатформову (щоб працювало і на Linux, і на Windows)
         run: |
-          mkdir -p artifacts/${{ matrix.module }}
+          python -c "import os; os.makedirs('artifacts/${{ matrix.module }}', exist_ok=True)"
           python src/${{ matrix.module }}.py > artifacts/${{ matrix.module }}/run.log 2>&1
 
       - name: Upload Artifacts
