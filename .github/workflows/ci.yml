@@ -36,7 +36,14 @@ jobs:
       - name: Install dependencies
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         run: |
-          pip install -r requirements.txt
+          # 1. Завантажуємо офіційний скрипт для встановлення/ремонту pip
+          python -c "import urllib.request; urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py')"
+          
+          # 2. Встановлюємо робочу версію pip для Python 3.13
+          python get-pip.py
+          
+          # 3. Встановлюємо залежності з вашого файлу
+          python -m pip install -r requirements.txt
 
       - name: Run ${{ matrix.module }}
         if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
@@ -44,7 +51,7 @@ jobs:
           # Створюємо папку командою, яку 100% розуміє Windows
           mkdir -Force artifacts/${{ matrix.module }}
           
-          # Запускаємо скрипт. Тепер ми побачимо весь вивід прямо на GitHub!
+          # Запускаємо скрипт
           python src/${{ matrix.module }}.py
 
       - name: Upload Artifacts
