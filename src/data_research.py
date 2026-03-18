@@ -95,7 +95,7 @@ def research(df):
     r2 = r2_score(y, predictions_train)
 
     print("\n===== MODEL EVALUATION =====")
-    print(f"R² score: {r2:.4f}")
+    print(f"R^2 score: {r2:.4f}")
     print(f"Intercept: {model.intercept_:.2f}")
 
     future_years = pd.DataFrame({"year_numeric": [2025, 2026, 2027]})
