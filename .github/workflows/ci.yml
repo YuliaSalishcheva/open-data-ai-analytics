@@ -1,4 +1,4 @@
-name: Python CI Pipeline
+name: Python CI Pipeline (Matrix)
 
 on:
   push:
@@ -6,44 +6,55 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
+    inputs:
+      module:
+        description: "Оберіть модуль для запуску (або 'all')"
+        required: true
+        default: "all"
+        type: choice
+        options:
+          - all
+          - data_load
+          - data_quality_analysis
+          - data_research
+          - visualization
 
 jobs:
-  build-and-test:
+  run-modules:
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [data_load, data_quality_analysis, data_research, visualization]
 
     steps:
       - name: Checkout code
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         uses: actions/checkout@v4
 
       - name: Set up Python
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Create Artifacts Directory
-        run: mkdir -p artifacts
-
-      - name: Run Data Loading
-        run: python src/data_load.py > artifacts/load.log 2>&1
-
-      - name: Run Analysis
-        run: python src/data_quality_analysis.py > artifacts/analysis.log 2>&1
-
-      - name: Run Data Research
-        run: python src/data_research.py > artifacts/research.log 2>&1
-
-      - name: Run Visualization
-        run: python src/visualization.py > artifacts/viz.log 2>&1
+      - name: Run ${{ matrix.module }}
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module }}
+        run: |
+          mkdir -p artifacts/${{ matrix.module }}
+          python src/${{ matrix.module }}.py > artifacts/${{ matrix.module }}/run.log 2>&1
 
       - name: Upload Artifacts
-        if: always()
+        if: ${{ !cancelled() && (github.event_name != 'workflow_dispatch' || inputs.module == 'all' || inputs.module == matrix.module) }}
         uses: actions/upload-artifact@v4
         with:
-          name: project-reports
-          path: artifacts/
+          name: logs-${{ matrix.module }}
+          path: artifacts/${{ matrix.module }}

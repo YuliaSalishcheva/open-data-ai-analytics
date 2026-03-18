@@ -30,11 +30,7 @@ jobs:
 
       - name: Run visualization module
         run: |
-          # Створюємо папку для артефактів (PowerShell style)
           if (!(Test-Path "artifacts/visualization")) { New-Item -ItemType Directory -Force -Path "artifacts/visualization" }
-          
-          # Запускаємо модуль. Переконайся, що шлях src/visualization.py вірний
-          # Якщо файл лежить в корені, приберіть "src/"
           python src/visualization.py > artifacts/visualization/run.log 2>&1
 
       - name: Upload artifacts
