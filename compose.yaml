@@ -1,5 +1,4 @@
 services:
-  # 1. База даних (Центральне сховище)
   db:
     image: postgres:15
     environment:

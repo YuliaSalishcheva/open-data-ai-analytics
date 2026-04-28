@@ -2,11 +2,12 @@ from flask import Flask, render_template
 import os
 import pandas as pd
 from sqlalchemy import create_engine
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 db_url = os.getenv('DATABASE_URL', 'postgresql://user:password@db:5432/analytics_db')
 engine = create_engine(db_url)
-
+metrics = PrometheusMetrics(app)
 @app.route('/')
 def index():
     try:
