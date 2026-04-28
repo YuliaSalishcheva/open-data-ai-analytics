@@ -6,4 +6,5 @@ __pycache__/
 .idea/
 
 data/raw/
-actions-runner/
+actions-runner/terraform.tfstate*
+.terraform/
