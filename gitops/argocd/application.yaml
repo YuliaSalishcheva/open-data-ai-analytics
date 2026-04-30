@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-app
+  source:
+    repoURL: https://github.com/YuliaSalishcheva/open-data-ai-analytics.git
+    targetRevision: main
+    path: gitops/app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
