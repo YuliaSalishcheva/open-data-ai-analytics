@@ -1,20 +1,40 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: my-app
-  namespace: my-app
+  name: open-data-web
+  namespace: gitops-lab
+  labels:
+    app: open-data-web
+
 spec:
   replicas: 3
+
   selector:
     matchLabels:
-      app: my-app
+      app: open-data-web
+
   template:
     metadata:
       labels:
-        app: my-app
+        app: open-data-web
+
     spec:
       containers:
-        - name: my-app
-          image: nginx:latest
+        - name: open-data-container
+
+          image: yuliia/open-data-app:v1
+
           ports:
-            - containerPort: 3000
+            - containerPort: 5000
+
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+
+          env:
+            - name: APP_VERSION
+              value: "gitops-v1"
